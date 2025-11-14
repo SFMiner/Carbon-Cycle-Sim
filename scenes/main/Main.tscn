@@ -1,32 +1,35 @@
-[gd_scene load_steps=0 format=3 uid="uid://d2kqjs8owbkyd"]
+[gd_scene format=3 uid="uid://bndlq4si7wop3"]
 
 [node name="Main" type="Node2D"]
 
 [node name="Background" type="ColorRect" parent="."]
-anchors_left = 0.0
-anchors_top = 0.0
-anchors_right = 1.0
-anchors_bottom = 1.0
 color = Color(0.529412, 0.807843, 0.921569, 1)
 
 [node name="TitleLabel" type="Label" parent="."]
-offset_left = -295.0
-offset_top = 100.0
-offset_right = 295.0
-offset_bottom = 150.0
+anchors_preset = 5
 anchor_left = 0.5
-anchor_top = 0.0
+anchor_right = 0.5
+offset_left = 105.0
+offset_top = 120.0
+offset_right = 695.0
+offset_bottom = 170.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 28
 text = "Carbon Quest: From Sunlight to Life"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 28
 
 [node name="StatusLabel" type="Label" parent="."]
-offset_left = -200.0
-offset_top = -25.0
-offset_right = 200.0
-offset_bottom = 25.0
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 188.0
+offset_top = -32.0
+offset_right = 588.0
+offset_bottom = 18.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
 text = "Phase 1 Complete - Foundation Established"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 16
