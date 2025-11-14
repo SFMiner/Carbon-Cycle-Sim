@@ -1,35 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://dw7p5qu0hjqow"]
-
-[ext_resource type="Script" path="res://scripts/systems/Workspace.gd" id="1_r2pah"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_8xg4v"]
-radius = 300.0
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_6gp7u"]
-width = 600
-height = 600
-fill = 1
-gradient = SubResource("Gradient_2qjpb")
-
-[sub_resource type="Gradient" id="Gradient_2qjpb"]
-colors = PackedColorArray(0.564706, 0.933333, 0.564706, 0.8, 0.564706, 0.933333, 0.564706, 0)
+[gd_scene load_steps=5 format=3 ]
 
 [node name="Workspace" type="Area2D"]
 position = Vector2(640, 360)
-script = ExtResource("1_r2pah")
-capacity = 20
-workspace_color = Color(0.564706, 0.933333, 0.564706, 1)
-full_color = Color(1, 0, 0, 1)
 
 [node name="CollisionShape" type="CollisionShape2D" parent="."]
-shape = SubResource("CircleShape2D_8xg4v")
 
 [node name="Border" type="Line2D" parent="."]
-points = PackedVector2Array(300, 0, 291.421, -77.055, 264.645, -150, 223.607, -212.132, 168.787, -258.819, 100, -292.893, 0, -300, -100, -292.893, -168.787, -258.819, -223.607, -212.132, -264.645, -150, -291.421, -77.055, -300, 0, -291.421, 77.055, -264.645, 150, -223.607, 212.132)
-width = 5.0
-default_color = Color(0.564706, 0.933333, 0.564706, 0.8)
-antialiased = true
 
 [node name="BackgroundGlow" type="Sprite2D" parent="."]
-modulate = Color(1, 1, 1, 0.3)
-texture = SubResource("GradientTexture2D_6gp7u")

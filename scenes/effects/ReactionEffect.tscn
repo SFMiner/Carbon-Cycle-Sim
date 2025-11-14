@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://b3gx8kcl7nfsr"]
+
+[ext_resource type="Script" path="res://scripts/effects/ReactionEffect.gd" id="1_p0msr"]
+
+[node name="ReactionEffect" type="Node2D"]
+script = ExtResource("1_p0msr")
+effect_color = Color(0.564706, 0.933333, 0.564706, 1)
+duration = 0.8

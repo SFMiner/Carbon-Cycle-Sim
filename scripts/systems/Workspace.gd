@@ -12,6 +12,7 @@ signal capacity_available()
 
 var molecules_in_workspace: Array[Molecule] = []
 var is_full: bool = false
+var pulse_tween: Tween
 
 
 func _ready() -> void:
@@ -27,6 +28,9 @@ func _ready() -> void:
 
 	# Update visual
 	update_visual()
+
+	# Start idle pulse
+	start_idle_pulse()
 
 
 func _on_area_entered(area: Area2D) -> void:
@@ -96,3 +100,32 @@ func clear_molecules() -> void:
 	molecules_in_workspace.clear()
 	is_full = false
 	update_visual()
+
+
+func pulse_reaction(reaction_color: Color) -> void:
+	"""Pulse background glow on reaction."""
+	var background = get_node_or_null("BackgroundGlow")
+	if not background:
+		return
+
+	# Kill existing tween if running
+	if pulse_tween:
+		pulse_tween.kill()
+
+	# Create pulse animation
+	pulse_tween = create_tween()
+	pulse_tween.tween_property(background, "modulate", Color(reaction_color, 0.8), 0.2)
+	pulse_tween.tween_property(background, "modulate", Color(workspace_color, 0.3), 0.6)
+
+
+func start_idle_pulse() -> void:
+	"""Create looping breathing animation on background glow."""
+	var background = get_node_or_null("BackgroundGlow")
+	if not background:
+		return
+
+	# Create looping pulse tween
+	pulse_tween = create_tween()
+	pulse_tween.set_loops()
+	pulse_tween.tween_property(background, "modulate", Color(workspace_color, 0.5), 1.5)
+	pulse_tween.tween_property(background, "modulate", Color(workspace_color, 0.2), 1.5)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://dkqgvxtx7k3dj"]
+[gd_scene load_steps=10 format=3 uid="uid://dkqgvxtx7k3dj"]
 
 [ext_resource type="Script" path="res://scripts/systems/MoleculeSpawner.gd" id="1_6rxyf"]
 [ext_resource type="PackedScene" uid="uid://d2bq24jma47ll" path="res://scenes/molecules/Photon.tscn" id="2_5owq1"]
@@ -7,6 +7,10 @@
 [ext_resource type="PackedScene" uid="uid://doajlk4d5xg51" path="res://scenes/molecules/H2O.tscn" id="5_p8jq2"]
 [ext_resource type="PackedScene" uid="uid://dw7p5qu0hjqow" path="res://scenes/stages/WorkspaceStage1.tscn" id="6_p6ej8"]
 [ext_resource type="PackedScene" uid="uid://d1m2ug6pcr8c5" path="res://scenes/systems/TrashZone.tscn" id="7_x5e8w"]
+[ext_resource type="Script" path="res://scripts/systems/ReactionHandler.gd" id="8_xf2iq"]
+[ext_resource type="PackedScene" uid="uid://b3gx8kcl7nfsr" path="res://scenes/effects/ReactionEffect.tscn" id="9_0l8pu"]
+[ext_resource type="Script" path="res://scripts/effects/CameraShake.gd" id="10_tqcl3"]
+[ext_resource type="Script" path="res://scripts/systems/OutputSpawner.gd" id="11_j7n4k"]
 
 [node name="TestSpawner" type="Node2D"]
 script = ExtResource("3_8tqp2")
@@ -47,6 +51,28 @@ enabled = true
 [node name="Workspace" parent="." instance=ExtResource("6_p6ej8")]
 
 [node name="TrashZone" parent="." instance=ExtResource("7_x5e8w")]
+
+[node name="ReactionHandler" type="Node" parent="."]
+script = ExtResource("8_xf2iq")
+workspace = NodePath("Workspace")
+reaction_type = 0
+enabled = true
+
+[node name="ReactionEffect" parent="." instance=ExtResource("9_0l8pu")]
+
+[node name="Camera" type="Camera2D" parent="."]
+position = Vector2(640, 360)
+enabled = true
+anchor_mode = 0
+
+[node name="CameraShake" type="Node" parent="."]
+script = ExtResource("10_tqcl3")
+camera = NodePath("../Camera")
+shake_amount = 5.0
+shake_duration = 0.2
+
+[node name="OutputSpawner" type="Node" parent="."]
+script = ExtResource("11_j7n4k")
 
 [node name="DebugLabel" type="Label" parent="."]
 offset_left = 10.0

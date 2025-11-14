@@ -20,6 +20,7 @@ run/main_scene="res://scenes/main/Main.tscn"
 GameConstants="*res://scripts/autoload/GameConstants.gd"
 GameManager="*res://scripts/autoload/GameManager.gd"
 SaveSystem="*res://scripts/autoload/SaveSystem.gd"
+AudioManager="*res://scripts/systems/AudioManager.gd"
 
 [display]
 
