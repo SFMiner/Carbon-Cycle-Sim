@@ -13,6 +13,13 @@ config_version=5
 config/name="Carbon Quest: From Sunlight to Life"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
+run/main_scene="res://scenes/main/Main.tscn"
+
+[autoload]
+
+GameConstants="*res://scripts/autoload/GameConstants.gd"
+GameManager="*res://scripts/autoload/GameManager.gd"
+SaveSystem="*res://scripts/autoload/SaveSystem.gd"
 
 [display]
 

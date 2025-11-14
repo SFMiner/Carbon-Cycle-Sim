@@ -1,0 +1,36 @@
+{
+	"photosynthesis": {
+		"name": "Photosynthesis",
+		"equation_text": "6 CO₂ + 6 H₂O + Light Energy → C₆H₁₂O₆ + 6 O₂",
+		"equation_plain": "6 CO2 + 6 H2O + Light -> C6H12O6 + 6 O2",
+		"inputs": {
+			"CO2": 6,
+			"H2O": 6,
+			"photons": 12
+		},
+		"outputs": {
+			"glucose": 1,
+			"O2": 6
+		},
+		"description": "Plants use sunlight to convert carbon dioxide and water into glucose and oxygen."
+	},
+	"respiration": {
+		"name": "Cellular Respiration",
+		"equation_text": "C₆H₁₂O₆ + 6 O₂ → 6 CO₂ + 6 H₂O + ATP (Energy)",
+		"equation_plain": "C6H12O6 + 6 O2 -> 6 CO2 + 6 H2O + Energy",
+		"inputs": {
+			"glucose": 1,
+			"O2": 6
+		},
+		"outputs": {
+			"CO2": 6,
+			"H2O": 6,
+			"ATP": 3
+		},
+		"description": "Cells break down glucose using oxygen to release energy, producing carbon dioxide and water."
+	},
+	"carbon_cycle": {
+		"name": "Carbon Cycle",
+		"description": "The continuous movement of carbon between living organisms and the atmosphere. Plants perform photosynthesis (using CO₂, producing O₂), while animals perform cellular respiration (using O₂, producing CO₂). These processes are complementary - the outputs of one become the inputs of the other."
+	}
+}
