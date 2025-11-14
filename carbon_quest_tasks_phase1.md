@@ -3445,7 +3445,1317 @@ Before proceeding to Phase 4, verify:
 - [ ] Progress label updates when glucose created
 - [ ] Workspace full warning appears at 20 molecules
 
+### Task 4.3: Stage 1 HUD Implementation
+**Dependencies**: Task 4.2 (Stage 1 controller works)  
+**Extended thinking**: OFF  
+**Reminder**: Before starting, ask the human: "Is extended thinking on? For this task, it should be **OFF**."
+
+**Implementation**:
+1. Create `res://scenes/ui/HUD_Stage1.tscn`:
+   - Root: CanvasLayer (name: "HUD")
+   - Layer: 10 (appears on top)
+
+2. Add top bar panel:
+   - Add child: Panel (name: "TopPanel")
+	 - Anchor: Top
+	 - Size: 1280×60
+	 - Theme: Create new Theme → StyleBox: Dark semi-transparent
+
+3. Add title label:
+   - Add child to TopPanel: Label (name: "StageTitle")
+	 - Text: "Stage 1: Photosynthesis Factory"
+	 - Position: (20, 15)
+	 - Font Size: 24
+	 - Color: White
+
+4. Add progress label:
+   - Add child to TopPanel: Label (name: "ProgressLabel")
+	 - Text: "Glucose Created: 0/5"
+	 - Position: (900, 15)
+	 - Font Size: 20
+	 - Color: White
+
+5. Add left panel for molecule counters:
+   - Add child: Panel (name: "LeftPanel")
+	 - Anchor: Top Left
+	 - Size: 200×250
+	 - Position: (10, 80)
+
+6. Add molecule counter labels:
+   - Add VBoxContainer to LeftPanel
+   - Add Labels: "CO₂: 0", "H₂O: 0", "Photons: 0"
+   - Font Size: 18
+
+7. Add bottom buttons:
+   - Add child: Button (name: "RestartButton")
+	 - Text: "Restart Stage"
+	 - Position: (20, 660)
+	 - Size: (150, 40)
+   
+   - Add child: Button (name: "HelpButton")
+	 - Text: "Help"
+	 - Position: (190, 660)
+	 - Size: (100, 40)
+
+8. Add workspace full warning:
+   - Add child: Label (name: "WarningLabel")
+	 - Text: "Workspace Full! Remove molecules to continue"
+	 - Position: (400, 400) - center
+	 - Font Size: 20
+	 - Color: Red
+	 - Visible: false
+
+9. Save scene
+
+**Human Checkpoint**:
+- [ ] HUD scene opens without errors
+- [ ] All UI elements positioned correctly
+- [ ] Title shows "Stage 1: Photosynthesis Factory"
+- [ ] Progress shows "Glucose Created: 0/5"
+- [ ] Molecule counters visible on left
+- [ ] Restart and Help buttons at bottom
+- [ ] Warning label hidden by default
+
+---
+
+### Task 4.4: HUD Controller Script
+**Dependencies**: Task 4.3 (HUD scene created)  
+**Extended thinking**: OFF  
+**Reminder**: Before starting, ask the human: "Is extended thinking on? For this task, it should be **OFF**."
+
+**Implementation**:
+1. Create `res://scripts/ui/HUD_Stage1.gd`:
+   ```gdscript
+   extends CanvasLayer
+   class_name HUD_Stage1
+   
+   @onready var progress_label: Label = $TopPanel/ProgressLabel
+   @onready var co2_label: Label = $LeftPanel/VBoxContainer/CO2Label
+   @onready var h2o_label: Label = $LeftPanel/VBoxContainer/H2OLabel
+   @onready var photon_label: Label = $LeftPanel/VBoxContainer/PhotonLabel
+   @onready var warning_label: Label = $WarningLabel
+   @onready var restart_button: Button = $RestartButton
+   @onready var help_button: Button = $HelpButton
+   
+   signal restart_requested()
+   signal help_requested()
+   
+   func _ready() -> void:
+   	# Connect buttons
+   	restart_button.pressed.connect(_on_restart_pressed)
+   	help_button.pressed.connect(_on_help_pressed)
+   	GameManager.glucose_created_updated.connect(_on_glucose_updated)
+   	update_progress(0)
+   
+   func _process(_delta: float) -> void:
+   	update_molecule_counts()
+   
+   func update_molecule_counts() -> void:
+   	var co2_count = 0
+   	var h2o_count = 0
+   	var photon_count = 0
+   	
+   	var workspace = get_node_or_null("/root/Stage1/Workspace")
+   	if workspace and workspace is Workspace:
+   		for molecule in workspace.molecules_in_workspace:
+   			match molecule.molecule_type:
+   				Molecule.MoleculeType.CO2:
+   					co2_count += 1
+   				Molecule.MoleculeType.H2O:
+   					h2o_count += 1
+   				Molecule.MoleculeType.PHOTON:
+   					photon_count += 1
+   	
+   	co2_label.text = "CO₂: %d" % co2_count
+   	h2o_label.text = "H₂O: %d" % h2o_count
+   	photon_label.text = "Photons: %d" % photon_count
+   
+   func update_progress(glucose_count: int) -> void:
+   	progress_label.text = "Glucose Created: %d/%d" % [glucose_count, GameConstants.STAGE1_GLUCOSE_TARGET]
+   
+   func show_workspace_full_warning(show: bool) -> void:
+   	warning_label.visible = show
+   
+   func _on_glucose_updated(count: int) -> void:
+   	update_progress(count)
+   
+   func _on_restart_pressed() -> void:
+   	restart_requested.emit()
+   
+   func _on_help_pressed() -> void:
+   	help_requested.emit()
+   ```
+
+2. Use tabs, type hints
+3. Save and attach to HUD scene
+
+4. Update Stage1Controller:
+   ```gdscript
+   func _ready() -> void:
+   	# ... existing code ...
+   	
+   	if workspace:
+   		workspace.capacity_reached.connect(_on_workspace_full)
+   		workspace.capacity_available.connect(_on_workspace_available)
+   
+   func _on_workspace_full() -> void:
+   	var hud = get_node_or_null("HUD")
+   	if hud and hud.has_method("show_workspace_full_warning"):
+   		hud.show_workspace_full_warning(true)
+   
+   func _on_workspace_available() -> void:
+   	var hud = get_node_or_null("HUD")
+   	if hud and hud.has_method("show_workspace_full_warning"):
+   		hud.show_workspace_full_warning(false)
+   ```
+
+**Human Checkpoint**:
+- [ ] HUD script compiles without errors
+- [ ] Running Stage 1 shows all UI elements
+- [ ] Molecule counters update in real-time
+- [ ] Progress updates when glucose created
+- [ ] Workspace full warning appears at 20 molecules
+- [ ] Warning disappears when molecules removed
+- [ ] Restart/Help buttons emit signals
+
+---
+
+### Task 4.5: Tutorial Overlay System
+**Dependencies**: Task 4.4 (HUD works)  
+**Extended thinking**: OFF  
+**Reminder**: Before starting, ask the human: "Is extended thinking on? For this task, it should be **OFF**."
+
+**Implementation**:
+1. Create `res://scenes/ui/TutorialOverlay.tscn`:
+   - Root: CanvasLayer (name: "TutorialOverlay")
+   - Layer: 100
+
+2. Add blocker:
+   - ColorRect (name: "Blocker")
+	 - Anchor: Full Rect
+	 - Color: Black, alpha 0.7
+	 - Mouse Filter: Stop
+
+3. Add content:
+   - Control (name: "Content", Anchor: Center, Size: 600×400)
+   - Label (name: "InstructionLabel", Font Size: 24, Autowrap: On)
+   - Button (name: "GotItButton", Text: "Got it!", Size: 150×50)
+
+4. Add arrow sprite placeholder
+
+5. Save scene
+
+6. Create `res://scripts/ui/TutorialOverlay.gd`:
+   ```gdscript
+   extends CanvasLayer
+   class_name TutorialOverlay
+   
+   signal tutorial_complete()
+   
+   @onready var instruction_label: Label = $Content/InstructionLabel
+   @onready var got_it_button: Button = $Content/GotItButton
+   
+   var current_step: int = 0
+   var tutorial_steps: Array[Dictionary] = []
+   var auto_dismiss_timer: Timer
+   
+   func _ready() -> void:
+   	got_it_button.pressed.connect(_on_got_it_pressed)
+   	auto_dismiss_timer = Timer.new()
+   	add_child(auto_dismiss_timer)
+   	auto_dismiss_timer.timeout.connect(_on_auto_dismiss)
+   	auto_dismiss_timer.one_shot = true
+   	auto_dismiss_timer.wait_time = 30.0
+   	visible = false
+   
+   func show_tutorial(steps: Array[Dictionary]) -> void:
+   	tutorial_steps = steps
+   	current_step = 0
+   	visible = true
+   	show_step(current_step)
+   	auto_dismiss_timer.start()
+   
+   func show_step(step_index: int) -> void:
+   	if step_index >= tutorial_steps.size():
+   		complete_tutorial()
+   		return
+   	
+   	var step = tutorial_steps[step_index]
+   	instruction_label.text = step.get("text", "")
+   
+   func _on_got_it_pressed() -> void:
+   	current_step += 1
+   	if current_step < tutorial_steps.size():
+   		show_step(current_step)
+   	else:
+   		complete_tutorial()
+   
+   func _on_auto_dismiss() -> void:
+   	complete_tutorial()
+   
+   func complete_tutorial() -> void:
+   	visible = false
+   	auto_dismiss_timer.stop()
+   	tutorial_complete.emit()
+   ```
+
+7. Save and attach script
+
+**Human Checkpoint**:
+- [ ] Tutorial scene opens without errors
+- [ ] Blocker covers full screen
+- [ ] Instruction label and button visible
+- [ ] Script compiles
+- [ ] Can show/hide programmatically
+
+---
+
+### Task 4.6: Stage 1 Tutorial Integration
+**Dependencies**: Task 4.5 (Tutorial overlay)  
+**Extended thinking**: OFF  
+**Reminder**: Before starting, ask the human: "Is extended thinking on? For this task, it should be **OFF**."
+
+**Implementation**:
+1. Add TutorialOverlay to Stage 1 scene
+
+2. Update Stage1Controller:
+   ```gdscript
+   @export var tutorial_overlay: TutorialOverlay
+   
+   func _ready() -> void:
+   	# ... existing code ...
+   	
+   	if not SaveSystem.save_data["settings"]["tutorial_seen"][0]:
+   		show_tutorial()
+   	
+   	if tutorial_overlay:
+   		tutorial_overlay.tutorial_complete.connect(_on_tutorial_complete)
+   
+   func show_tutorial() -> void:
+   	if not tutorial_overlay:
+   		return
+   	
+   	var steps: Array[Dictionary] = [
+   		{"text": "Welcome to Stage 1!\n\nDrag photons into the green chloroplast."},
+   		{"text": "Drag CO₂ molecules from the air."},
+   		{"text": "Drag H₂O molecules from the roots."},
+   		{"text": "Collect 6 CO₂ + 6 H₂O + 12 photons to make glucose!"}
+   	]
+   	
+   	tutorial_overlay.show_tutorial(steps)
+   
+   func _on_tutorial_complete() -> void:
+   	SaveSystem.save_data["settings"]["tutorial_seen"][0] = true
+   	SaveSystem.save_game()
+   ```
+
+**Human Checkpoint**:
+- [ ] First run shows tutorial
+- [ ] Tutorial has 4 steps
+- [ ] "Got it!" advances steps
+- [ ] After completion, tutorial doesn't show again
+- [ ] Auto-dismisses after 30 seconds
+
+---
+
+### Task 4.7: Stage 2 Scene Assembly  
+**Dependencies**: Task 4.6 (Stage 1 complete)  
+**Extended thinking**: OFF  
+**Reminder**: Before starting, ask the human: "Is extended thinking on? For this task, it should be **OFF**."
+
+**Implementation**:
+1. Duplicate Stage1_Photosynthesis.tscn → Save as Stage2_Respiration.tscn
+
+2. Modify workspace:
+   - Replace with oval workspace (400×250)
+   - Border color: Orange (#FFB347)
+
+3. Update spawners:
+   - Delete Photon, CO2, H2O spawners
+   - Add GlucoseSpawner (spawn_rate: 0.5)
+   - Add O2Spawner (spawn_rate: 4.0)
+
+4. Update ReactionHandler:
+   - reaction_type: RESPIRATION
+
+5. Update ReactionEffect:
+   - effect_color: #FFB347 (orange)
+
+6. Keep TrashZone, Camera, CameraShake
+
+**Human Checkpoint**:
+- [ ] Stage 2 scene created
+- [ ] Oval workspace with orange border
+- [ ] Glucose spawns slowly from left
+- [ ] O2 spawns quickly from right
+- [ ] ReactionHandler set to RESPIRATION
+- [ ] Scene runs without errors
+
+---
+
+### Task 4.8: Stage 2 Controller and HUD
+**Dependencies**: Task 4.7 (Stage 2 scene)  
+**Extended thinking**: OFF  
+**Reminder**: Before starting, ask the human: "Is extended thinking on? For this task, it should be **OFF**."
+
+**Implementation**:
+1. Create `res://scripts/stages/Stage2Controller.gd` (similar to Stage1Controller but tracking glucose_broken)
+
+2. Create HUD_Stage2.tscn (duplicate HUD_Stage1):
+   - Update title: "Stage 2: Cellular Respiration"
+   - Update progress: "Glucose Broken Down: 0/5"
+   - Update counters: "Glucose: 0", "O₂: 0"
+   - Add ProgressBar for energy meter
+
+3. Create HUD_Stage2.gd:
+   ```gdscript
+   extends CanvasLayer
+   class_name HUD_Stage2
+   
+   # Similar to HUD_Stage1 but:
+   # - Track glucose_broken instead of glucose_created
+   # - Add fill_energy_meter() function for ATP visualization
+   # - Update glucose and O2 counters
+   ```
+
+4. Add tutorial for Stage 2 (3 steps about glucose and O2)
+
+**Human Checkpoint**:
+- [ ] Stage2Controller compiles
+- [ ] Running Stage 2 spawns glucose and O2
+- [ ] Dragging 1 glucose + 6 O2 triggers respiration
+- [ ] Orange flash and ATP bolts appear
+- [ ] HUD shows progress
+- [ ] Energy meter fills on reaction
+- [ ] Tutorial shows on first play
+- [ ] Completes at 5 glucose broken
+
+---
+
+### Task 4.9: Stage Transition System
+**Dependencies**: Task 4.8 (Both stages work)  
+**Extended thinking**: OFF  
+**Reminder**: Before starting, ask the human: "Is extended thinking on? For this task, it should be **OFF**."
+
+**Implementation**:
+1. Create `res://scenes/ui/StageComplete.tscn`:
+   - CanvasLayer with semi-transparent background
+   - Panel with completion message
+   - Statistics display (time, reactions, efficiency)
+   - Continue button
+
+2. Create `res://scripts/ui/StageComplete.gd`:
+   ```gdscript
+   extends CanvasLayer
+   class_name StageComplete
+   
+   signal continue_pressed()
+   
+   func show_completion(stage_num: int, time: float, reactions: int, efficiency: float) -> void:
+   	visible = true
+   	# Update labels with statistics
+   	# Play fanfare sound
+   ```
+
+3. Add fade transition helper to Stage controllers
+
+4. Connect stage_complete signals to show StageComplete screen
+
+**Human Checkpoint**:
+- [ ] StageComplete scene opens
+- [ ] Shows statistics
+- [ ] Continue button works
+- [ ] Fade transitions smooth
+
+---
+
+## PHASE 4 COMPLETION VERIFICATION
+
+### Stage 1 Complete
+- [ ] Photosynthesis gameplay functional
+- [ ] HUD shows all counters
+- [ ] Tutorial appears first time only
+- [ ] Completes at 5 glucose
+
+### Stage 2 Complete
+- [ ] Respiration gameplay functional
+- [ ] Energy meter fills
+- [ ] Tutorial appears first time
+- [ ] Completes at 5 glucose broken
+
+### Progression
+- [ ] Stage unlocking works
+- [ ] SaveSystem persists progress
+- [ ] Completion screen shows stats
+- [ ] Transitions work
+
+---
+
+## PHASE 5: Stage 3 Ecosystem Simulation
+
+**Phase Goal**: Implement ecosystem with plants, animals, atmospheric balance  
+**Duration**: 3-4 weeks  
+**MVP Status**: **MVP ACHIEVED HERE**
+
+---
+
+### Task 5.1: Plant and Animal Scenes
+**Dependencies**: Phase 4 Complete  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Create Plant.tscn:
+   - Node2D root with green sprite
+   - AnimationPlayer with "idle_sway" (2s loop)
+   - Animation "produce_o2" (0.5s green glow)
+
+2. Create Plant.gd:
+   ```gdscript
+   extends Node2D
+   class_name Plant
+   
+   signal tick_processed()
+   
+   func process_tick() -> void:
+   	# Play glow animation
+   	tick_processed.emit()
+   
+   func perform_photosynthesis() -> Dictionary:
+   	return {
+   		"co2_change": -GameConstants.PLANT_CO2_CONSUMPTION,
+   		"o2_change": GameConstants.PLANT_O2_PRODUCTION
+   	}
+   ```
+
+3. Create Animal.tscn (similar but brown, breathe animation)
+
+4. Create Animal.gd (similar but respiration)
+
+**Human Checkpoint**:
+- [ ] Plant scene has sway animation
+- [ ] Plant has glow animation
+- [ ] Plant script has perform_photosynthesis()
+- [ ] Animal scene has breathe animation
+- [ ] Animal script has perform_respiration()
+
+---
+
+### Task 5.2: Atmosphere Manager System
+**Dependencies**: Task 5.1 (Organisms exist)  
+**Extended thinking**: ON  
+**Reminder**: Before starting, ask the human: "Is extended thinking on? For this task, it should be **ON**."
+
+**Implementation**:
+1. Create `res://scripts/systems/AtmosphereManager.gd`:
+   ```gdscript
+   extends Node
+   class_name AtmosphereManager
+   
+   signal gases_updated(co2: int, o2: int)
+   signal balance_changed(is_balanced: bool)
+   signal net_change_updated(co2_change: int, o2_change: int)
+   
+   var co2_level: int = GameConstants.ATMOSPHERE_INITIAL_CO2
+   var o2_level: int = GameConstants.ATMOSPHERE_INITIAL_O2
+   var is_balanced: bool = false
+   var plants: Array[Plant] = []
+   var animals: Array[Animal] = []
+   var tick_timer: Timer
+   
+   func _ready() -> void:
+   	tick_timer = Timer.new()
+   	add_child(tick_timer)
+   	tick_timer.wait_time = GameConstants.TICK_RATE
+   	tick_timer.timeout.connect(_on_tick)
+   	tick_timer.start()
+   	check_balance()
+   
+   func _on_tick() -> void:
+   	# Calculate net changes from organisms
+   	var net_co2 = 0
+   	var net_o2 = 0
+   	
+   	for plant in plants:
+   		var changes = plant.perform_photosynthesis()
+   		net_co2 += changes["co2_change"]
+   		net_o2 += changes["o2_change"]
+   		plant.process_tick()
+   	
+   	for animal in animals:
+   		var changes = animal.perform_respiration()
+   		net_co2 += changes["co2_change"]
+   		net_o2 += changes["o2_change"]
+   		animal.process_tick()
+   	
+   	# Apply recovery mechanics
+   	if co2_level < GameConstants.ATMOSPHERE_RECOVERY_THRESHOLD_LOW:
+   		net_co2 += GameConstants.ATMOSPHERE_RECOVERY_RATE
+   	if o2_level > GameConstants.ATMOSPHERE_RECOVERY_THRESHOLD_HIGH:
+   		net_o2 -= GameConstants.ATMOSPHERE_RECOVERY_RATE
+   	
+   	# Apply changes
+   	co2_level += net_co2
+   	o2_level += net_o2
+   	co2_level = clampi(co2_level, GameConstants.ATMOSPHERE_MIN, GameConstants.ATMOSPHERE_MAX)
+   	o2_level = clampi(o2_level, GameConstants.ATMOSPHERE_MIN, GameConstants.ATMOSPHERE_MAX)
+   	
+   	gases_updated.emit(co2_level, o2_level)
+   	net_change_updated.emit(net_co2, net_o2)
+   	check_balance()
+   
+   func check_balance() -> void:
+   	var was_balanced = is_balanced
+   	is_balanced = (
+   		co2_level >= GameConstants.ATMOSPHERE_BALANCED_MIN and
+   		co2_level <= GameConstants.ATMOSPHERE_BALANCED_MAX and
+   		o2_level >= GameConstants.ATMOSPHERE_BALANCED_MIN and
+   		o2_level <= GameConstants.ATMOSPHERE_BALANCED_MAX
+   	)
+   	if is_balanced != was_balanced:
+   		balance_changed.emit(is_balanced)
+   ```
+
+2. Add organism registration functions
+
+**Human Checkpoint**:
+- [ ] Script compiles
+- [ ] Tick processing handles plants/animals
+- [ ] Recovery mechanics apply
+- [ ] Balance state determined correctly
+- [ ] All signals emit properly
+
+---
+
+### Task 5.3: Stage 3 Scene Assembly
+**Dependencies**: Task 5.2 (AtmosphereManager)  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Create Stage3_Ecosystem.tscn:
+   - Sky background
+   - Soil at bottom
+   - PlantZone (left) with 3 initial plants
+   - AnimalZone (right) with 3 initial animals
+   - AtmosphereManager node
+   - Camera2D
+
+2. Position organisms vertically in zones
+
+**Human Checkpoint**:
+- [ ] Scene opens without errors
+- [ ] 3 plants on left
+- [ ] 3 animals on right
+- [ ] AtmosphereManager present
+- [ ] Scene runs independently
+
+---
+
+### Task 5.4: Stage 3 Controller with Add/Remove
+**Dependencies**: Task 5.3 (Scene assembled)  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Create Stage3Controller.gd:
+   ```gdscript
+   extends Node2D
+   class_name Stage3Controller
+   
+   signal stage_complete()
+   
+   var balance_time: float = 0.0
+   var add_plant_cooldown: float = 0.0
+   var add_animal_cooldown: float = 0.0
+   
+   func _ready() -> void:
+   	GameManager.start_stage(3)
+   	# Register initial organisms
+   	# Connect signals
+   	# Show tutorial
+   
+   func _process(delta: float) -> void:
+   	# Update cooldowns
+   	# Update balance timer if balanced
+   	if atmosphere_manager.is_balanced:
+   		balance_time += delta
+   		GameManager.update_balance_time(balance_time)
+   		if balance_time >= GameConstants.BALANCE_TIME_GOAL:
+   			complete_stage()
+   
+   func add_plant() -> void:
+   	if add_plant_cooldown > 0:
+   		return
+   	# Check limits
+   	# Spawn plant
+   	# Register with atmosphere
+   	# Set cooldown
+   
+   func remove_plant() -> void:
+   	# Remove last plant
+   
+   func add_animal() -> void:
+   	# Similar to add_plant
+   
+   func remove_animal() -> void:
+   	# Similar to remove_plant
+   ```
+
+2. Implement organism spawning with vertical positioning
+
+**Human Checkpoint**:
+- [ ] Script compiles
+- [ ] Initial organisms registered
+- [ ] add_plant() spawns and positions correctly
+- [ ] remove_plant() removes last one
+- [ ] Same for animals
+- [ ] Cooldowns prevent spam
+- [ ] Max limits enforced
+- [ ] Balance timer accumulates
+- [ ] Completes at 120 seconds
+
+---
+
+### Task 5.5: Stage 3 HUD with Gas Visualization
+**Dependencies**: Task 5.4 (Controller works)  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Create HUD_Stage3.tscn:
+   - Top bar with title and balance timer
+   - Left panel: CO2 meter (vertical bar, 0-200)
+   - Right panel: O2 meter (vertical bar, 0-200)
+   - Net change indicators (+/- per second)
+   - Add/Remove buttons for plants and animals
+   - Organism counters
+
+2. Create HUD_Stage3.gd:
+   ```gdscript
+   extends CanvasLayer
+   class_name HUD_Stage3
+   
+   func update_gas_levels(co2: int, o2: int) -> void:
+   	# Update meter fill amounts
+   	# Color code: green in 50-150 range, red outside
+   
+   func update_net_changes(co2_change: int, o2_change: int) -> void:
+   	# Show +/- arrows and values
+   
+   func update_balance_time(time: float) -> void:
+   	# Update timer display
+   ```
+
+**Human Checkpoint**:
+- [ ] HUD shows both gas meters
+- [ ] Meters fill correctly (0-200 scale)
+- [ ] Green when balanced, red when not
+- [ ] Net change arrows show direction
+- [ ] Add/Remove buttons functional
+- [ ] Balance timer displays
+- [ ] Cooldowns disable buttons temporarily
+
+---
+
+### Task 5.6: Tutorial for Stage 3
+**Dependencies**: Task 5.5 (HUD works)  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Add TutorialOverlay to Stage 3
+
+2. Create tutorial steps:
+   ```gdscript
+   var steps: Array[Dictionary] = [
+   	{"text": "Welcome to Stage 3: The Carbon Cycle!\n\nWatch plants and animals work together."},
+   	{"text": "Plants perform photosynthesis:\nUse CO₂, produce O₂."},
+   	{"text": "Animals perform respiration:\nUse O₂, produce CO₂."},
+   	{"text": "Keep BOTH gases balanced (50-150) for 2 minutes!"}
+   ]
+   ```
+
+3. Connect tutorial_complete to save setting
+
+**Human Checkpoint**:
+- [ ] Tutorial shows on first play
+- [ ] 4 steps explain mechanics
+- [ ] Doesn't show on subsequent plays
+- [ ] Tutorial_seen[2] saves correctly
+
+---
+
+## PHASE 5 COMPLETION VERIFICATION
+
+### Ecosystem Mechanics
+- [ ] Plants perform photosynthesis each tick
+- [ ] Animals perform respiration each tick
+- [ ] Atmosphere tracks CO2 and O2 (0-200)
+- [ ] Recovery mechanics apply at thresholds
+- [ ] Balance state determined correctly
+
+### Organism Management
+- [ ] Can add plants (max 10)
+- [ ] Can remove plants
+- [ ] Can add animals (max 10)
+- [ ] Can remove animals
+- [ ] Cooldowns prevent spam (0.5s)
+- [ ] Organisms position vertically
+
+### Stage 3 Gameplay
+- [ ] HUD shows gas levels visually
+- [ ] Net changes display with arrows
+- [ ] Balance timer counts when 50-150
+- [ ] Completes at 120 seconds balanced
+- [ ] Tutorial explains mechanics
+
+### MVP Achievement
+- [ ] All 3 stages playable end-to-end
+- [ ] Core learning objectives met
+- [ ] Game can be completed
+
+---
+
+## PHASE 6: UI/UX Polish
+
+**Phase Goal**: Menu systems, settings, transitions  
+**Duration**: 2-3 weeks  
+**MVP Status**: Post-MVP Enhancement
+
+---
+
+### Task 6.1: Main Menu Scene
+**Dependencies**: Phase 5 Complete (MVP)  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Create MainMenu.tscn:
+   - Background (animated carbon cycle visual)
+   - Title logo
+   - Play button
+   - Settings button
+   - Credits button
+
+2. Create MainMenu.gd with scene loading
+
+**Human Checkpoint**:
+- [ ] Main menu displays
+- [ ] Buttons functional
+- [ ] Loads Stage 1 on Play
+
+---
+
+### Task 6.2: Settings Menu
+**Dependencies**: Task 6.1  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Create SettingsMenu.tscn:
+   - SFX volume slider
+   - Music volume slider
+   - Colorblind mode checkbox
+   - Back button
+
+2. Connect to SaveSystem.save_data["settings"]
+
+**Human Checkpoint**:
+- [ ] Settings UI displays
+- [ ] Volume sliders work
+- [ ] Colorblind toggle works
+- [ ] Settings persist
+
+---
+
+### Task 6.3: Pause Menu
+**Dependencies**: Task 6.2  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Create PauseMenu.tscn (overlay)
+2. Add to each stage scene
+3. Handle pause/unpause with tree pausing
+
+**Human Checkpoint**:
+- [ ] ESC key pauses game
+- [ ] Can resume
+- [ ] Can restart stage
+- [ ] Can return to main menu
+
+---
+
+### Task 6.4: Colorblind Mode Implementation  
+**Dependencies**: Task 6.2 (Settings exist)  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Add pattern overlays to molecules:
+   - CO2: Diagonal stripes
+   - H2O: Horizontal stripes  
+   - Glucose: Checkerboard
+
+2. Update Molecule.gd to show/hide patterns based on SaveSystem setting
+
+**Human Checkpoint**:
+- [ ] Patterns appear when enabled
+- [ ] Patterns hide when disabled
+- [ ] All molecule types have patterns
+- [ ] Patterns don't affect gameplay
+
+---
+
+### Task 6.5: Stage Select Screen
+**Dependencies**: Task 6.3  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Create StageSelect.tscn:
+   - Three stage buttons with lock icons
+   - Display best times
+   - Display completion status
+
+2. Load stages based on SaveSystem.save_data["player"]["stages_unlocked"]
+
+**Human Checkpoint**:
+- [ ] Shows 3 stage buttons
+- [ ] Locked stages grayed out
+- [ ] Can select unlocked stages
+- [ ] Shows best times
+
+---
+
+## PHASE 6 COMPLETION VERIFICATION
+
+- [ ] Main menu functional
+- [ ] Settings menu saves preferences
+- [ ] Pause menu works in all stages
+- [ ] Colorblind mode adds patterns
+- [ ] Stage select shows progression
+
+---
+
+## PHASE 7: Audio Integration
+
+**Phase Goal**: Add sound effects and music  
+**Duration**: 1 week  
+**MVP Status**: Post-MVP Enhancement
+
+---
+
+### Task 7.1: Source Sound Effects
+**Dependencies**: Phase 6 Complete  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Download from Pixabay (free license):
+   - Molecule pickup (soft "boop")
+   - Molecule drop ("click")
+   - Reaction sounds (chime for photosynthesis, whoosh for respiration)
+   - Workspace full (buzz)
+   - Delete (pop)
+   - Button clicks
+   - Achievement fanfare
+
+2. Convert to OGG Vorbis at 96 kbps
+3. Place in res://assets/audio/sfx/
+
+**Human Checkpoint**:
+- [ ] All sound files downloaded
+- [ ] Files converted to OGG
+- [ ] Files in correct folder
+- [ ] Files import without errors
+
+---
+
+### Task 7.2: Implement AudioManager Playback
+**Dependencies**: Task 7.1  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Update AudioManager.gd:
+   ```gdscript
+   var sounds: Dictionary = {
+   	SoundType.MOLECULE_PICKUP: preload("res://assets/audio/sfx/pickup.ogg"),
+   	SoundType.MOLECULE_DROP: preload("res://assets/audio/sfx/drop.ogg"),
+   	# ... etc
+   }
+   
+   func play_sound(sound_type: SoundType) -> void:
+   	var player = get_available_player()
+   	if not player:
+   		return
+   	player.stream = sounds[sound_type]
+   	player.volume_db = linear_to_db(SaveSystem.save_data["settings"]["sfx_volume"] / 100.0)
+   	player.play()
+   ```
+
+2. Replace all print placeholders with actual playback
+
+**Human Checkpoint**:
+- [ ] All sound types have audio files
+- [ ] Sounds play when triggered
+- [ ] Volume respects settings
+- [ ] No audio clipping or distortion
+
+---
+
+### Task 7.3: Background Music
+**Dependencies**: Task 7.2  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Source or compose 3 music tracks:
+   - Main menu (calm, inviting)
+   - Stages 1-2 (upbeat, educational)
+   - Stage 3 (ambient, balanced)
+
+2. Create MusicManager AutoLoad:
+   ```gdscript
+   extends Node
+   
+   var music_player: AudioStreamPlayer
+   var current_track: String = ""
+   
+   func play_track(track_name: String) -> void:
+   	# Fade out current
+   	# Load new track
+   	# Fade in
+   ```
+
+3. Call from stage controllers
+
+**Human Checkpoint**:
+- [ ] 3 music tracks sourced
+- [ ] MusicManager AutoLoad configured
+- [ ] Music plays in each scene
+- [ ] Smooth crossfades between tracks
+- [ ] Volume respects settings
+- [ ] Music loops seamlessly
+
+---
+
+## PHASE 7 COMPLETION VERIFICATION
+
+- [ ] All SFX playing correctly
+- [ ] Music tracks transition smoothly
+- [ ] Volume controls work for both SFX and music
+- [ ] No audio bugs or glitches
+- [ ] Performance stable with audio
+
+---
+
+## PHASE 8: Testing & Deployment
+
+**Phase Goal**: Bug fixing, optimization, web deployment  
+**Duration**: 1-2 weeks  
+**MVP Status**: Final Polish
+
+---
+
+### Task 8.1: Performance Optimization
+**Dependencies**: Phase 7 Complete  
+**Extended thinking**: ON  
+**Reminder**: Before starting, ask the human: "Is extended thinking on? For this task, it should be **ON**."
+
+**Implementation**:
+1. Profile game on Chromebook (Intel Celeron N4020):
+   - Run Debug → Profiler
+   - Check frame time in all stages
+   - Identify bottlenecks
+
+2. Optimize molecule spawning:
+   - Verify object pooling working
+   - Limit max active molecules
+   - Reduce collision checks where possible
+
+3. Optimize visuals:
+   - Use simpler gradients
+   - Reduce particle counts if needed
+   - Disable antialiasing on slow devices
+
+4. Target: 30+ FPS on Chromebook, 60 FPS on desktop
+
+**Human Checkpoint**:
+- [ ] Profiler shows acceptable frame times
+- [ ] No frame drops during reactions
+- [ ] Memory usage stable over 10 minutes
+- [ ] 30+ FPS on Chromebook confirmed
+- [ ] No memory leaks
+
+---
+
+### Task 8.2: Chromebook Compatibility Testing
+**Dependencies**: Task 8.1  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Test on actual Chromebook hardware:
+   - Intel Celeron N4020 or similar
+   - 4GB RAM
+   - Chrome browser
+
+2. Test checklist:
+   - All 3 stages load
+   - All interactions responsive
+   - No crashes
+   - Audio works
+   - Save/load works (localStorage)
+   - Touch input works (optional)
+
+3. Document any issues and fix
+
+**Human Checkpoint**:
+- [ ] Game loads in under 10 seconds
+- [ ] All stages playable
+- [ ] No crashes during 30-minute session
+- [ ] Audio plays correctly
+- [ ] Save/load functional
+- [ ] Frame rate acceptable
+
+---
+
+### Task 8.3: Cross-Browser Testing
+**Dependencies**: Task 8.2  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Test in multiple browsers:
+   - Chrome
+   - Firefox
+   - Edge
+   - Safari (if possible)
+
+2. Test localStorage compatibility
+3. Test audio playback
+4. Test HTML5 canvas rendering
+5. Fix any browser-specific issues
+
+**Human Checkpoint**:
+- [ ] Works in Chrome
+- [ ] Works in Firefox
+- [ ] Works in Edge
+- [ ] Works in Safari (if tested)
+- [ ] localStorage works in all browsers
+- [ ] Audio works in all browsers
+- [ ] No visual glitches
+
+---
+
+### Task 8.4: Bug Fixing Pass
+**Dependencies**: Task 8.3  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Review all known bugs and issues
+2. Prioritize by severity:
+   - Critical (game-breaking)
+   - Major (gameplay-affecting)
+   - Minor (polish issues)
+
+3. Fix in order of priority
+
+4. Test fixes thoroughly
+
+**Human Checkpoint**:
+- [ ] All critical bugs fixed
+- [ ] All major bugs fixed
+- [ ] Most minor bugs fixed
+- [ ] No regressions introduced
+- [ ] Game completable end-to-end
+
+---
+
+### Task 8.5: Final HTML5 Export
+**Dependencies**: Task 8.4  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Configure final export settings:
+   - Export Mode: Release
+   - Optimize for size
+   - Enable compression
+   - Set proper CORS headers (if needed)
+
+2. Export to builds/web/
+
+3. Test exported build:
+   - Load locally
+   - Test all features
+   - Check file size (< 10 MB target)
+
+4. Optimize if needed:
+   - Compress audio further
+   - Optimize textures
+   - Remove unused assets
+
+**Human Checkpoint**:
+- [ ] Export completes without errors
+- [ ] Exported build < 10 MB
+- [ ] All features work in export
+- [ ] No console errors
+- [ ] Load time < 10 seconds
+
+---
+
+### Task 8.6: GitHub Pages Deployment
+**Dependencies**: Task 8.5  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Create GitHub repository (if not exists)
+2. Create gh-pages branch
+3. Copy builds/web/ contents to gh-pages
+4. Configure GitHub Pages settings
+5. Add custom domain (optional)
+6. Test deployed URL
+
+**Human Checkpoint**:
+- [ ] Repository created
+- [ ] gh-pages branch configured
+- [ ] Game accessible at GitHub Pages URL
+- [ ] All features work online
+- [ ] No CORS errors
+- [ ] Share URL works
+
+---
+
+### Task 8.7: Teacher Documentation
+**Dependencies**: Task 8.6  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Create TEACHER_GUIDE.md:
+   - Learning objectives
+   - Lesson plan suggestions
+   - Discussion prompts
+   - Assessment ideas
+   - Common misconceptions
+   - Extension activities
+
+2. Create STANDARDS.md:
+   - NGSS alignment details
+   - State standards mapping
+
+3. Add to repository
+
+**Human Checkpoint**:
+- [ ] TEACHER_GUIDE.md complete
+- [ ] STANDARDS.md complete
+- [ ] Documents clear and actionable
+- [ ] Includes assessment rubrics
+
+---
+
+### Task 8.8: Student Documentation
+**Dependencies**: Task 8.7  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Create HOW_TO_PLAY.md:
+   - Controls
+   - Objectives for each stage
+   - Tips and strategies
+
+2. Create SCIENCE_BACKGROUND.md:
+   - Real-world photosynthesis
+   - Real-world respiration
+   - Carbon cycle importance
+   - Climate connections
+
+**Human Checkpoint**:
+- [ ] HOW_TO_PLAY.md clear for students
+- [ ] SCIENCE_BACKGROUND.md at appropriate level
+- [ ] Links to additional resources
+
+---
+
+### Task 8.9: Final Testing & QA
+**Dependencies**: All previous tasks  
+**Extended thinking**: OFF  
+
+**Implementation**:
+1. Complete playthrough test:
+   - New player experience
+   - Complete all 3 stages
+   - Check all tutorials
+   - Test all UI elements
+   - Verify save/load
+
+2. Edge case testing:
+   - Fill workspace to capacity
+   - Drag molecules off-screen
+   - Spam buttons
+   - Clear localStorage and restart
+   - Long play sessions
+
+3. Create bug report template
+4. Fix any final issues found
+
+**Human Checkpoint**:
+- [ ] Full playthrough successful
+- [ ] All edge cases handled
+- [ ] No crashes or soft-locks
+- [ ] UI always responsive
+- [ ] Game logic always correct
+- [ ] Ready for release
+
+---
+
+## PHASE 8 COMPLETION VERIFICATION
+
+### Performance
+- [ ] 60 FPS on desktop
+- [ ] 30+ FPS on Chromebook
+- [ ] No memory leaks
+- [ ] Fast load times
+
+### Compatibility
+- [ ] Works in all major browsers
+- [ ] Chromebook tested and verified
+- [ ] localStorage functional
+- [ ] Audio works everywhere
+
+### Deployment
+- [ ] Deployed to GitHub Pages
+- [ ] Publicly accessible
+- [ ] No CORS issues
+- [ ] Share URL works
+
+### Documentation
+- [ ] Teacher guide complete
+- [ ] Student guides complete
+- [ ] Standards alignment documented
+- [ ] README comprehensive
+
+### Quality
+- [ ] All critical bugs fixed
+- [ ] Game completable
+- [ ] Educational objectives met
+- [ ] Ready for classroom use
+
+---
+
+## 🎉 PROJECT COMPLETE!
+
+**Total Duration**: 14-23 weeks (depending on complexity of each phase)
+
+**Final Deliverables**:
+✅ Complete 3-stage educational game  
+✅ Web-deployed and accessible  
+✅ Chromebook-compatible  
+✅ Teacher and student documentation  
+✅ Standards-aligned  
+✅ Source code on GitHub  
+
+**Next Steps**:
+1. Beta test with students
+2. Collect teacher feedback
+3. Iterate based on real classroom use
+4. Consider post-MVP enhancements:
+   - Carbon atom tracker
+   - Realistic mode (100:1 ratios)
+   - Ecosystem scenarios
+   - Data export for teachers
+   - Spanish translation
+
+---
+
 **Document prepared by:** Claude (Sonnet 4.5)  
 **Date:** November 13, 2025  
-**Pipeline Stage:** Stage 5 (Task Generation) - Phase 1  
+**Pipeline Stage:** Stage 5 (Task Generation) - Phases 4-8 Complete  
 **Status:** Ready for Claude Code/Haiku execution
