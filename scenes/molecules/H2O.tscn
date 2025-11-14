@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://doajlk4d5xg51"]
+
+[ext_resource type="PackedScene" uid="uid://bj2yf5biqvjia" path="res://scenes/molecules/Molecule.tscn" id="1_0s5f6"]
+
+[node instance=ExtResource("1_0s5f6") name="Molecule"]
+molecule_type = 2
+
+[node name="Sprite" parent="." index="0"]
+modulate = Color(1, 0, 0, 1)

@@ -1,0 +1,33 @@
+[gd_scene load_steps=6 format=3 uid="uid://bj2yf5biqvjia"]
+
+[ext_resource type="Script" path="res://scripts/molecules/Molecule.gd" id="1_6rxyf"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_8xt54"]
+width = 64
+height = 64
+fill = 1
+
+[sub_resource type="Gradient" id="Gradient_w6mra"]
+colors = PackedColorArray(1, 1, 1, 1, 0.5, 0.5, 0.5, 1)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_vdgrj"]
+radius = 32.0
+
+[sub_resource type="Curve2D" id="Curve2D_f24bp"]
+
+[node name="Molecule" type="Area2D"]
+script = ExtResource("1_6rxyf")
+collision_layer = 2
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = SubResource("GradientTexture2D_8xt54")
+
+[node name="CollisionShape" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_vdgrj")
+
+[node name="HoverOutline" type="Line2D" parent="."]
+points = PackedVector2Array(36, 0, 25.45584, -25.45584, 0, -36, -25.45584, -25.45584, -36, 0, -25.45584, 25.45584, 0, 36, 25.45584, 25.45584)
+width = 3.0
+default_color = Color(1, 1, 1, 0)
+visible = false
