@@ -1,10 +1,23 @@
-[gd_scene load_steps=5 format=3 ]
+[gd_scene load_steps=3 format=3 uid="uid://bxirfan5mrhh0"]
+
+[ext_resource type="Script" uid="uid://cvuehhwidxdeh" path="res://scripts/workspace.gd" id="1_dvtfn"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_dvtfn"]
+radius = 300.0
 
 [node name="Workspace" type="Area2D"]
 position = Vector2(640, 360)
+script = ExtResource("1_dvtfn")
 
 [node name="CollisionShape" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_dvtfn")
 
 [node name="Border" type="Line2D" parent="."]
+position = Vector2(-1, 1)
+points = PackedVector2Array(300, 0, 291.421, -77.055, 264.645, -150, 223.607, -212.132, 168.787, -258.819, 100, -292.893, 0, -300, -100, -292.893, -168.787, -258.819, -223.607, -212.132, -264.645, -150, -291.421, -77.055, -300, 0, -291.421, 77.055, -264.645, 150, -223.607, 212.132, -168.787, 258.819, -100, 292.893, 0, 300, 100, 292.893, 168.787, 258.819, 223.607, 212.13, 264.645, 150, 291.421, 77.055, 300, 0)
+width = 5.0
+default_color = Color(0.564706, 0.933333, 0.564706, 0.8)
+antialiased = true
 
 [node name="BackgroundGlow" type="Sprite2D" parent="."]
+modulate = Color(1, 1, 1, 0.3)
