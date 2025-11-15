@@ -56,8 +56,9 @@ position = Vector2(671, 373)
 [node name="TrashZone" parent="." instance=ExtResource("7_x5e8w")]
 position = Vector2(979, 393)
 
-[node name="ReactionHandler" type="Node" parent="."]
+[node name="ReactionHandler" type="Node" parent="." node_paths=PackedStringArray("workspace")]
 script = ExtResource("8_xf2iq")
+workspace = NodePath("../Workspace")
 
 [node name="ReactionEffect" parent="." instance=ExtResource("9_0l8pu")]
 position = Vector2(114, 86)

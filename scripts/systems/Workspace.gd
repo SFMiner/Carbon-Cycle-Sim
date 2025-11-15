@@ -6,7 +6,7 @@ signal molecule_exited(molecule: Molecule)
 signal capacity_reached()
 signal capacity_available()
 
-@export var capacity: int = 20
+@export var capacity: int = 28
 @export var workspace_color: Color = Color.GREEN
 @export var full_color: Color = Color.RED
 
@@ -115,21 +115,21 @@ func check_for_dropped_molecules() -> void:
 	# Skip if workspace is full
 	if is_full:
 		return
-
+	
 	# Get all overlapping areas
 	var overlapping = get_overlapping_areas()
-
+	
 	for area in overlapping:
 		if area is Molecule:
 			var molecule = area as Molecule
-
+			
 			# Only process IDLE molecules not already tracked
 			if molecule.current_state == Molecule.State.IDLE and molecule not in molecules_in_workspace:
 				# Add to workspace
 				molecules_in_workspace.append(molecule)
 				molecule.current_state = Molecule.State.IN_WORKSPACE
-				molecule_entered.emit(molecule)
-
+				molecule_entered.emit(molecule)  # ← ADD THIS LINE IF MISSING!
+				
 				# Check if now full
 				if molecules_in_workspace.size() >= capacity:
 					is_full = true

@@ -131,5 +131,17 @@ func _check_respiration() -> void:
 
 func trigger_reaction(type: ReactionType, input_molecules: Array[Molecule], output_info: Dictionary) -> void:
 	"""Emit reaction signal and set cooldown."""
+
+	# Remove molecules from workspace BEFORE animation
+	for molecule in input_molecules:
+		if molecule in workspace.molecules_in_workspace:
+			workspace.molecules_in_workspace.erase(molecule)
+
+	# Update workspace state
+	if workspace.is_full and workspace.molecules_in_workspace.size() < workspace.capacity:
+		workspace.is_full = false
+		workspace.capacity_available.emit()
+		workspace.update_visual()
+
 	reaction_cooldown = REACTION_COOLDOWN_TIME
 	reaction_triggered.emit(type, input_molecules, output_info)

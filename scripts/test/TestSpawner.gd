@@ -20,7 +20,23 @@ func _process(delta: float) -> void:
 
 	var in_workspace = $Workspace.get_molecule_count()
 
-	$DebugLabel.text = "Total: %d | Workspace: %d/20 | Deleted: %d | Reactions: %d" % [total, in_workspace, molecules_deleted, reactions_occurred]
+	# Count each type in workspace
+	var co2_count = 0
+	var h2o_count = 0
+	var photon_count = 0
+
+	for molecule in $Workspace.molecules_in_workspace:
+		match molecule.molecule_type:
+			Molecule.MoleculeType.CO2:
+				co2_count += 1
+			Molecule.MoleculeType.H2O:
+				h2o_count += 1
+			Molecule.MoleculeType.PHOTON:
+				photon_count += 1
+
+	$DebugLabel.text = "Total: %d | Workspace: %d/28 (CO2:%d H2O:%d Photons:%d) | Reactions: %d" % [
+		total, in_workspace, co2_count, h2o_count, photon_count, reactions_occurred
+	]
 
 	if $Workspace.is_at_capacity():
 		$DebugLabel.modulate = Color.RED
