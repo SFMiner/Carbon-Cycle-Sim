@@ -8,6 +8,7 @@ enum State {IDLE, BEING_DRAGGED, IN_WORKSPACE, DESPAWNING, PHOTON_RAIN}
 var current_state: State = State.IDLE
 var drag_offset: Vector2 = Vector2.ZERO
 var time_since_spawn: float = 0.0
+var despawn_timer: float = 0.0  # Track time in despawning state
 var can_be_grabbed: bool = true
 var grab_cooldown_timer: float = 0.0
 var rain_velocity: Vector2 = Vector2.ZERO  # For photon rain movement
@@ -76,7 +77,16 @@ func _process_in_workspace(delta: float) -> void:
 
 
 func _process_despawning(delta: float) -> void:
-	pass  # Will implement fade-out animation later
+	despawn_timer += delta
+
+	# Fade out over 0.3 seconds
+	var fade_duration = 0.3
+	if despawn_timer < fade_duration:
+		var alpha = 1.0 - (despawn_timer / fade_duration)
+		modulate.a = alpha
+	else:
+		# Fade complete, remove molecule
+		queue_free()
 
 
 func _process_photon_rain(delta: float) -> void:
@@ -122,8 +132,8 @@ func stop_drag() -> void:
 
 func despawn() -> void:
 	current_state = State.DESPAWNING
+	despawn_timer = 0.0  # Reset timer for fade
 	despawned.emit(self)
-	queue_free()  # For now, will add animation later
 
 
 func _input(event: InputEvent) -> void:

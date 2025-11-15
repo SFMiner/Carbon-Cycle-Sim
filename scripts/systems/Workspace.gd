@@ -43,12 +43,13 @@ func _on_area_entered(area: Area2D) -> void:
 	if area is Molecule:
 		var molecule = area as Molecule
 
-		# Handle photons separately - just count them
+		# Handle photons separately - count and absorb them
 		if molecule.molecule_type == Molecule.MoleculeType.PHOTON and molecule.current_state == Molecule.State.PHOTON_RAIN:
 			if photons_collected < photon_capacity:
 				photons_collected += 1
+				# Absorb the photon - change to despawning state
+				molecule.current_state = Molecule.State.DESPAWNING
 				# Don't add to molecules_in_workspace array
-				# Photon continues moving through
 			return
 
 		# Ignore molecules that are being dragged

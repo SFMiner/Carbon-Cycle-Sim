@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=3 uid="uid://dkqgvxtx7k3dj"]
 
 [ext_resource type="Script" uid="uid://ehomnfxfvnk4" path="res://scripts/systems/MoleculeSpawner.gd" id="1_6rxyf"]
-[ext_resource type="PackedScene" path="res://scenes/molecules/Photon.tscn" id="2_5owq1"]
+[ext_resource type="PackedScene" uid="uid://bcypl8xr2lnmx" path="res://scenes/molecules/Photon.tscn" id="2_5owq1"]
 [ext_resource type="Script" uid="uid://f28s74nc7f6f" path="res://scripts/test/TestSpawner.gd" id="3_8tqp2"]
 [ext_resource type="PackedScene" path="res://scenes/molecules/CO2.tscn" id="4_abjc0"]
 [ext_resource type="PackedScene" path="res://scenes/molecules/H2O.tscn" id="5_p8jq2"]
