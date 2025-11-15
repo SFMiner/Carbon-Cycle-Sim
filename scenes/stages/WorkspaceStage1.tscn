@@ -1,13 +1,14 @@
 [gd_scene load_steps=3 format=3 uid="uid://bxirfan5mrhh0"]
 
-[ext_resource type="Script" uid="uid://cvuehhwidxdeh" path="res://scripts/workspace.gd" id="1_dvtfn"]
+[ext_resource type="Script" uid="uid://1o1n3oo3w1vk" path="res://scripts/systems/Workspace.gd" id="1_r2pah"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_dvtfn"]
 radius = 300.0
 
 [node name="Workspace" type="Area2D"]
 position = Vector2(640, 360)
-script = ExtResource("1_dvtfn")
+script = ExtResource("1_r2pah")
+workspace_color = Color(0.564706, 0.933333, 0.564706, 1)
 
 [node name="CollisionShape" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_dvtfn")

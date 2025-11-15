@@ -24,7 +24,7 @@ func _ready() -> void:
 	collision_mask = 0   # Don't collide with anything
 	monitoring = true
 	monitorable = true
-
+	$Label.text = MoleculeType.keys()[molecule_type]
 	# Adjust collision size for glucose
 	if molecule_type == MoleculeType.GLUCOSE:
 		var collision = get_node("CollisionShape") as CollisionShape2D

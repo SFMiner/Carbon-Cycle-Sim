@@ -1,15 +1,15 @@
 [gd_scene load_steps=3 format=3 uid="uid://d1m2ug6pcr8c5"]
 
-[ext_resource type="Script" path="res://scripts/systems/TrashZone.gd" id="1_mkx7e"]
+[ext_resource type="Script" uid="uid://cdrxu4g7ogd8m" path="res://scripts/systems/TrashZone.gd" id="1_mkx7e"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5gp5p"]
 size = Vector2(180, 120)
 
 [node name="TrashZone" type="Area2D"]
 position = Vector2(1190, 660)
-script = ExtResource("1_mkx7e")
 collision_layer = 8
 collision_mask = 2
+script = ExtResource("1_mkx7e")
 
 [node name="CollisionShape" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_5gp5p")

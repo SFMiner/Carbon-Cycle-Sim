@@ -1,5 +1,5 @@
 extends Node
-class_name AudioManager
+class_name AudioSoundManager
 
 # Sound effect players
 var sfx_players: Array[AudioStreamPlayer] = []

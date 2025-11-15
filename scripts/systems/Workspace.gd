@@ -33,9 +33,17 @@ func _ready() -> void:
 	start_idle_pulse()
 
 
+func _process(delta: float) -> void:
+	check_for_dropped_molecules()
+
+
 func _on_area_entered(area: Area2D) -> void:
 	if area is Molecule:
 		var molecule = area as Molecule
+
+		# Ignore molecules that are being dragged
+		if molecule.current_state == Molecule.State.BEING_DRAGGED:
+			return
 
 		# Check if workspace is full
 		if molecules_in_workspace.size() >= capacity:
@@ -44,7 +52,7 @@ func _on_area_entered(area: Area2D) -> void:
 				capacity_reached.emit()
 				update_visual()
 			return
-
+			
 		# Add to workspace
 		if molecule not in molecules_in_workspace:
 			molecules_in_workspace.append(molecule)
@@ -100,6 +108,34 @@ func clear_molecules() -> void:
 	molecules_in_workspace.clear()
 	is_full = false
 	update_visual()
+
+
+func check_for_dropped_molecules() -> void:
+	"""Check for molecules that were dropped inside workspace."""
+	# Skip if workspace is full
+	if is_full:
+		return
+
+	# Get all overlapping areas
+	var overlapping = get_overlapping_areas()
+
+	for area in overlapping:
+		if area is Molecule:
+			var molecule = area as Molecule
+
+			# Only process IDLE molecules not already tracked
+			if molecule.current_state == Molecule.State.IDLE and molecule not in molecules_in_workspace:
+				# Add to workspace
+				molecules_in_workspace.append(molecule)
+				molecule.current_state = Molecule.State.IN_WORKSPACE
+				molecule_entered.emit(molecule)
+
+				# Check if now full
+				if molecules_in_workspace.size() >= capacity:
+					is_full = true
+					capacity_reached.emit()
+					update_visual()
+					return  # Stop checking once full
 
 
 func pulse_reaction(reaction_color: Color) -> void:
