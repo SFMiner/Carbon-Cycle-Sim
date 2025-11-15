@@ -1,0 +1,104 @@
+[gd_scene load_steps=0 format=3 uid="uid://d1hqvprealbm5"]
+
+[node name="HUD" type="CanvasLayer"]
+layer = 10
+
+[node name="TopPanel" type="Panel" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 60.0
+
+[node name="StageTitle" type="Label" parent="TopPanel"]
+offset_left = 20.0
+offset_top = 15.0
+offset_right = 500.0
+offset_bottom = 45.0
+text = "Stage 1: Photosynthesis Factory"
+label_settings = SubResource("LabelSettings")
+text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
+
+[node name="ProgressLabel" type="Label" parent="TopPanel"]
+offset_left = 900.0
+offset_top = 15.0
+offset_right = 1260.0
+offset_bottom = 45.0
+text = "Glucose Created: 0/5"
+label_settings = SubResource("LabelSettings_2")
+text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
+horizontal_alignment = 2
+
+[node name="LeftPanel" type="Panel" parent="."]
+anchors_preset = 1
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 10.0
+offset_top = 80.0
+offset_right = 210.0
+offset_bottom = 330.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LeftPanel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CO2Label" type="Label" parent="LeftPanel/VBoxContainer"]
+layout_mode = 2
+text = "CO₂: 0"
+label_settings = SubResource("LabelSettings_3")
+
+[node name="H2OLabel" type="Label" parent="LeftPanel/VBoxContainer"]
+layout_mode = 2
+text = "H₂O: 0"
+label_settings = SubResource("LabelSettings_3")
+
+[node name="PhotonLabel" type="Label" parent="LeftPanel/VBoxContainer"]
+layout_mode = 2
+text = "Photons: 0/24"
+label_settings = SubResource("LabelSettings_3")
+
+[node name="RestartButton" type="Button" parent="."]
+offset_left = 20.0
+offset_top = 660.0
+offset_right = 170.0
+offset_bottom = 700.0
+text = "Restart Stage"
+
+[node name="HelpButton" type="Button" parent="."]
+offset_left = 190.0
+offset_top = 660.0
+offset_right = 290.0
+offset_bottom = 700.0
+text = "Help"
+
+[node name="WarningLabel" type="Label" parent="."]
+offset_left = 400.0
+offset_top = 400.0
+offset_right = 880.0
+offset_bottom = 440.0
+text = "Workspace Full! Remove molecules to continue"
+label_settings = SubResource("LabelSettings_4")
+text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
+horizontal_alignment = 1
+visible = false
+
+[sub_resource type="LabelSettings" id="LabelSettings"]
+font_sizes/font_size = 24
+font_colors/font_color = Color(1, 1, 1, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_2"]
+font_sizes/font_size = 20
+font_colors/font_color = Color(1, 1, 1, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_3"]
+font_sizes/font_size = 18
+font_colors/font_color = Color(1, 1, 1, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_4"]
+font_sizes/font_size = 20
+font_colors/font_color = Color(1, 0, 0, 1)

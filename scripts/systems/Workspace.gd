@@ -49,10 +49,10 @@ func _on_area_entered(area: Area2D) -> void:
 				photons_collected += 1
 				# Absorb the photon - change to despawning state
 				molecule.current_state = Molecule.State.DESPAWNING
-				# Don't add to molecules_in_workspace array
+				molecule.despawn_timer = 0.0  # Reset fade timer
+				molecule.despawned.emit(molecule)  # ← CRITICAL: Tell spawner it's gone!
 			return
 
-		# Ignore molecules that are being dragged
 		if molecule.current_state == Molecule.State.BEING_DRAGGED:
 			return
 

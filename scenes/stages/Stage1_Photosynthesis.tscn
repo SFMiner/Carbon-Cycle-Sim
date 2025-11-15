@@ -1,0 +1,96 @@
+[gd_scene load_steps=10 format=3 uid="uid://ctqto8jkyg11f"]
+
+[ext_resource type="PackedScene" uid="uid://bxirfan5mrhh0" path="res://scenes/stages/WorkspaceStage1.tscn" id="1_6c3yw"]
+[ext_resource type="PackedScene" uid="uid://d1m2ug6pcr8c5" path="res://scenes/systems/TrashZone.tscn" id="2_ahljy"]
+[ext_resource type="Script" uid="uid://bx203tgrngos7" path="res://scripts/systems/ReactionHandler.gd" id="3_8gn8o"]
+[ext_resource type="PackedScene" path="res://scenes/effects/ReactionEffect.tscn" id="4_y6qld"]
+[ext_resource type="Script" uid="uid://sihubf7faynu" path="res://scripts/systems/OutputSpawner.gd" id="5_4l9gh"]
+[ext_resource type="Script" uid="uid://ehomnfxfvnk4" path="res://scripts/systems/MoleculeSpawner.gd" id="6_03rq1"]
+[ext_resource type="PackedScene" uid="uid://bcypl8xr2lnmx" path="res://scenes/molecules/Photon.tscn" id="7_4t07n"]
+[ext_resource type="PackedScene" path="res://scenes/molecules/CO2.tscn" id="8_3fckm"]
+[ext_resource type="PackedScene" path="res://scenes/molecules/H2O.tscn" id="9_hqpor"]
+
+[node name="Stage1" type="Node2D"]
+
+[node name="Sky" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.529412, 0.807843, 0.921569, 1)
+
+[node name="Soil" type="ColorRect" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -200.0
+size_flags_horizontal = 3
+size_flags_vertical = 0
+color = Color(0.545098, 0.270588, 0.0745098, 1)
+
+[node name="SunRay1" type="Line2D" parent="."]
+points = PackedVector2Array(0, 0, 640, 360)
+width = 20.0
+default_color = Color(1, 1, 0, 0.2)
+antialiased = true
+
+[node name="SunRay2" type="Line2D" parent="."]
+points = PackedVector2Array(1280, 0, 640, 360)
+width = 20.0
+default_color = Color(1, 1, 0, 0.2)
+antialiased = true
+
+[node name="SunRay3" type="Line2D" parent="."]
+points = PackedVector2Array(200, 0, 640, 360)
+width = 20.0
+default_color = Color(1, 1, 0, 0.2)
+antialiased = true
+
+[node name="SunRay4" type="Line2D" parent="."]
+points = PackedVector2Array(1080, 0, 640, 360)
+width = 20.0
+default_color = Color(1, 1, 0, 0.2)
+antialiased = true
+
+[node name="Workspace" parent="." instance=ExtResource("1_6c3yw")]
+position = Vector2(640, 357)
+
+[node name="PhotonSpawner" type="Node2D" parent="."]
+position = Vector2(640, -27)
+script = ExtResource("6_03rq1")
+molecule_scene = ExtResource("7_4t07n")
+spawn_rate = 4.0
+spawn_zone_min = Vector2(-400, 0)
+spawn_zone_max = Vector2(400, 0)
+max_molecules = 50
+
+[node name="CO2Spawner" type="Node2D" parent="."]
+position = Vector2(100, 360)
+script = ExtResource("6_03rq1")
+molecule_scene = ExtResource("8_3fckm")
+spawn_zone_min = Vector2(0, -150)
+spawn_zone_max = Vector2(0, 150)
+
+[node name="H2OSpawner" type="Node2D" parent="."]
+position = Vector2(1180, 360)
+script = ExtResource("6_03rq1")
+molecule_scene = ExtResource("9_hqpor")
+spawn_zone_min = Vector2(0, -150)
+spawn_zone_max = Vector2(0, 150)
+
+[node name="TrashZone" parent="." instance=ExtResource("2_ahljy")]
+
+[node name="ReactionHandler" type="Node" parent="."]
+script = ExtResource("3_8gn8o")
+
+[node name="ReactionEffect" parent="." instance=ExtResource("4_y6qld")]
+
+[node name="OutputSpawner" type="Node" parent="."]
+script = ExtResource("5_4l9gh")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(3, 1)
+anchor_mode = 0
+zoom = Vector2(0.9, 0.9)
