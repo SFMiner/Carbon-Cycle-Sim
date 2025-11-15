@@ -54,6 +54,7 @@ func spawn_molecule() -> void:
 				molecule.despawned.connect(_on_molecule_despawned)
 
 	if molecule:
+		# Set spawn position with random offset
 		var spawn_pos = Vector2(
 			randf_range(spawn_zone_min.x, spawn_zone_max.x),
 			randf_range(spawn_zone_min.y, spawn_zone_max.y)
@@ -64,7 +65,21 @@ func spawn_molecule() -> void:
 		)
 		molecule.global_position = spawn_pos + offset
 		molecule.time_since_spawn = 0.0
-		molecule.current_state = Molecule.State.IDLE
+
+		# Check if this is a photon - set up rain behavior
+		if molecule.molecule_type == Molecule.MoleculeType.PHOTON:
+			molecule.current_state = Molecule.State.PHOTON_RAIN
+			molecule.can_be_grabbed = false
+
+			# Random slope between -3.0 and 3.0
+			var slope = randf_range(-3.0, 3.0)
+			# Base downward speed: 720 pixels/second
+			var base_speed = 720.0
+			# Calculate velocity with slope
+			molecule.rain_velocity = Vector2(slope * base_speed / 10.0, base_speed)
+		else:
+			molecule.current_state = Molecule.State.IDLE
+
 		active_molecules.append(molecule)
 
 func _on_molecule_despawned(molecule: Molecule) -> void:

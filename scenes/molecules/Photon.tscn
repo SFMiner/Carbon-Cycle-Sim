@@ -1,9 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://d2bq24jma47ll"]
+[gd_scene load_steps=3 format=3 uid="uid://bcypl8xr2lnmx"]
 
-[ext_resource type="PackedScene" uid="uid://bj2yf5biqvjia" path="res://scenes/molecules/Molecule.tscn" id="1_0s5f6"]
+[ext_resource type="PackedScene" uid="uid://b85gxba6w3e34" path="res://scenes/molecules/Molecule.tscn" id="1_0s5f6"]
+[ext_resource type="Texture2D" uid="uid://bbww0vshbwjtb" path="res://assets/sprites/molecules/photon.png" id="2_dqrin"]
 
-[node instance=ExtResource("1_0s5f6") name="Molecule"]
+[node name="Molecule" instance=ExtResource("1_0s5f6")]
 molecule_type = 0
 
 [node name="Sprite" parent="." index="0"]
 modulate = Color(1, 1, 0, 1)
+texture = ExtResource("2_dqrin")

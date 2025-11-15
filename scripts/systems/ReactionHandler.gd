@@ -45,13 +45,11 @@ func _check_photosynthesis() -> void:
 	"""Check for: 6 CO2 + 6 H2O + 12 photons → glucose + 6 O2."""
 	var co2_count = 0
 	var h2o_count = 0
-	var photon_count = 0
 
 	var co2_molecules: Array[Molecule] = []
 	var h2o_molecules: Array[Molecule] = []
-	var photon_molecules: Array[Molecule] = []
 
-	# Count molecules, excluding those being dragged
+	# Count molecules (excluding photons now - they're tracked separately)
 	for molecule in workspace.molecules_in_workspace:
 		if molecule.current_state == Molecule.State.BEING_DRAGGED:
 			continue
@@ -63,20 +61,19 @@ func _check_photosynthesis() -> void:
 			Molecule.MoleculeType.H2O:
 				h2o_count += 1
 				h2o_molecules.append(molecule)
-			Molecule.MoleculeType.PHOTON:
-				photon_count += 1
-				photon_molecules.append(molecule)
+
+	# Get photon count from workspace
+	var photon_count = workspace.get_photon_count()
 
 	# Check if requirements met
 	if (co2_count >= GameConstants.PHOTOSYNTHESIS_CO2_NEEDED and
 		h2o_count >= GameConstants.PHOTOSYNTHESIS_H2O_NEEDED and
 		photon_count >= GameConstants.PHOTOSYNTHESIS_PHOTONS_NEEDED):
 
-		# Collect exact number needed
+		# Collect exact number of molecules needed (no photons in array)
 		var input_molecules: Array[Molecule] = []
 		input_molecules.append_array(co2_molecules.slice(0, GameConstants.PHOTOSYNTHESIS_CO2_NEEDED))
 		input_molecules.append_array(h2o_molecules.slice(0, GameConstants.PHOTOSYNTHESIS_H2O_NEEDED))
-		input_molecules.append_array(photon_molecules.slice(0, GameConstants.PHOTOSYNTHESIS_PHOTONS_NEEDED))
 
 		# Prepare output info
 		var output_info = {
@@ -131,11 +128,18 @@ func _check_respiration() -> void:
 
 func trigger_reaction(type: ReactionType, input_molecules: Array[Molecule], output_info: Dictionary) -> void:
 	"""Emit reaction signal and set cooldown."""
-
+	
 	# Remove molecules from workspace BEFORE animation
 	for molecule in input_molecules:
 		if molecule in workspace.molecules_in_workspace:
 			workspace.molecules_in_workspace.erase(molecule)
+
+		# CRITICAL FIX: Emit despawned signal so spawners can track properly
+		molecule.despawned.emit(molecule)
+
+	# Remove photons from workspace counter
+	if type == ReactionType.PHOTOSYNTHESIS:
+		workspace.remove_photons(GameConstants.PHOTOSYNTHESIS_PHOTONS_NEEDED)
 
 	# Update workspace state
 	if workspace.is_full and workspace.molecules_in_workspace.size() < workspace.capacity:

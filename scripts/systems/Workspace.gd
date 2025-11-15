@@ -11,6 +11,8 @@ signal capacity_available()
 @export var full_color: Color = Color.RED
 
 var molecules_in_workspace: Array[Molecule] = []
+var photons_collected: int = 0  # Separate photon counter
+var photon_capacity: int = 24  # Photons needed for reaction
 var is_full: bool = false
 var pulse_tween: Tween
 
@@ -41,6 +43,14 @@ func _on_area_entered(area: Area2D) -> void:
 	if area is Molecule:
 		var molecule = area as Molecule
 
+		# Handle photons separately - just count them
+		if molecule.molecule_type == Molecule.MoleculeType.PHOTON and molecule.current_state == Molecule.State.PHOTON_RAIN:
+			if photons_collected < photon_capacity:
+				photons_collected += 1
+				# Don't add to molecules_in_workspace array
+				# Photon continues moving through
+			return
+
 		# Ignore molecules that are being dragged
 		if molecule.current_state == Molecule.State.BEING_DRAGGED:
 			return
@@ -52,7 +62,7 @@ func _on_area_entered(area: Area2D) -> void:
 				capacity_reached.emit()
 				update_visual()
 			return
-			
+
 		# Add to workspace
 		if molecule not in molecules_in_workspace:
 			molecules_in_workspace.append(molecule)
@@ -89,6 +99,15 @@ func get_molecule_count() -> int:
 
 func is_at_capacity() -> bool:
 	return is_full
+
+
+func get_photon_count() -> int:
+	return photons_collected
+
+
+func remove_photons(count: int) -> void:
+	"""Remove photons after reaction consumes them."""
+	photons_collected = max(0, photons_collected - count)
 
 
 func update_visual() -> void:

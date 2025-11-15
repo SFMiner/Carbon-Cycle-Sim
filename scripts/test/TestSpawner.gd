@@ -19,11 +19,11 @@ func _process(delta: float) -> void:
 	total += $H2OSpawner.active_molecules.size()
 
 	var in_workspace = $Workspace.get_molecule_count()
+	var photons = $Workspace.get_photon_count()
 
-	# Count each type in workspace
+	# Count each molecule type in workspace (not photons)
 	var co2_count = 0
 	var h2o_count = 0
-	var photon_count = 0
 
 	for molecule in $Workspace.molecules_in_workspace:
 		match molecule.molecule_type:
@@ -31,11 +31,9 @@ func _process(delta: float) -> void:
 				co2_count += 1
 			Molecule.MoleculeType.H2O:
 				h2o_count += 1
-			Molecule.MoleculeType.PHOTON:
-				photon_count += 1
 
-	$DebugLabel.text = "Total: %d | Workspace: %d/28 (CO2:%d H2O:%d Photons:%d) | Reactions: %d" % [
-		total, in_workspace, co2_count, h2o_count, photon_count, reactions_occurred
+	$DebugLabel.text = "Total: %d | Workspace: %d/28 (CO2:%d H2O:%d) Photons:%d/24 | Reactions: %d" % [
+		total, in_workspace, co2_count, h2o_count, photons, reactions_occurred
 	]
 
 	if $Workspace.is_at_capacity():

@@ -2,7 +2,7 @@ extends Area2D
 class_name Molecule
 
 enum MoleculeType {PHOTON, CO2, H2O, O2, GLUCOSE}
-enum State {IDLE, BEING_DRAGGED, IN_WORKSPACE, DESPAWNING}
+enum State {IDLE, BEING_DRAGGED, IN_WORKSPACE, DESPAWNING, PHOTON_RAIN}
 
 @export var molecule_type: MoleculeType = MoleculeType.CO2
 var current_state: State = State.IDLE
@@ -10,6 +10,7 @@ var drag_offset: Vector2 = Vector2.ZERO
 var time_since_spawn: float = 0.0
 var can_be_grabbed: bool = true
 var grab_cooldown_timer: float = 0.0
+var rain_velocity: Vector2 = Vector2.ZERO  # For photon rain movement
 
 signal picked_up(molecule: Molecule)
 signal dropped(molecule: Molecule, position: Vector2)
@@ -47,6 +48,8 @@ func _process(delta: float) -> void:
 			_process_in_workspace(delta)
 		State.DESPAWNING:
 			_process_despawning(delta)
+		State.PHOTON_RAIN:
+			_process_photon_rain(delta)
 
 	# Update grab cooldown
 	if grab_cooldown_timer > 0:
@@ -74,6 +77,15 @@ func _process_in_workspace(delta: float) -> void:
 
 func _process_despawning(delta: float) -> void:
 	pass  # Will implement fade-out animation later
+
+
+func _process_photon_rain(delta: float) -> void:
+	# Move photon downward with slope
+	global_position += rain_velocity * delta
+
+	# Despawn if off bottom of screen
+	if global_position.y > 720 + 50:  # 50px buffer
+		despawn()
 
 
 func _on_input_event(viewport: Node, event: InputEvent, shape_idx: int) -> void:
