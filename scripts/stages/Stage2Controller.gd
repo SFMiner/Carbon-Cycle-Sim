@@ -9,14 +9,18 @@ signal stage_complete()
 @export var workspace: Workspace
 @export var camera_shake: CameraShake
 @export var tutorial_overlay: TutorialOverlay
+@export var stage_complete_overlay: StageComplete
 
 var glucose_broken: int = 0
 var target_glucose: int = GameConstants.STAGE2_GLUCOSE_TARGET
+var stage_start_time: float = 0.0
+var reaction_count: int = 0
 
 
 func _ready() -> void:
 	# Initialize GameManager
 	GameManager.start_stage(2)
+	stage_start_time = Time.get_ticks_msec() / 1000.0
 
 	# Connect signals
 	if reaction_handler:
@@ -33,6 +37,9 @@ func _ready() -> void:
 	if tutorial_overlay:
 		tutorial_overlay.tutorial_complete.connect(_on_tutorial_complete)
 
+	if stage_complete_overlay:
+		stage_complete_overlay.continue_pressed.connect(_on_stage_complete_continue)
+
 	# Show tutorial on first run
 	if not SaveSystem.save_data["settings"]["tutorial_seen"][1]:
 		show_tutorial()
@@ -43,6 +50,8 @@ func _ready() -> void:
 
 func _on_reaction_triggered(type: ReactionHandler.ReactionType, input_molecules: Array[Molecule], output_info: Dictionary) -> void:
 	"""Handle respiration reaction."""
+	reaction_count += 1
+
 	# Visual effects
 	if workspace:
 		workspace.pulse_reaction(Color.ORANGE)
@@ -79,10 +88,18 @@ func _on_glucose_updated(count: int) -> void:
 
 
 func complete_stage() -> void:
-	"""Stage 2 complete."""
+	"""Stage 2 complete - show completion screen."""
 	print("Stage 2 Complete!")
 	stage_complete.emit()
 	GameManager.complete_stage(2)
+
+	# Calculate statistics
+	var elapsed_time = (Time.get_ticks_msec() / 1000.0) - stage_start_time
+	var efficiency = float(glucose_broken) / float(reaction_count) if reaction_count > 0 else 0.0
+
+	# Show stage complete screen
+	if stage_complete_overlay:
+		stage_complete_overlay.show_completion(2, elapsed_time, reaction_count, efficiency)
 
 
 func restart_stage() -> void:
@@ -131,3 +148,9 @@ func _on_tutorial_complete() -> void:
 	"""Save tutorial seen state."""
 	SaveSystem.save_data["settings"]["tutorial_seen"][1] = true
 	SaveSystem.save_game()
+
+
+func _on_stage_complete_continue() -> void:
+	"""Fade to next stage or main menu."""
+	# TODO: Implement fade transition to Stage 3 or main menu
+	pass

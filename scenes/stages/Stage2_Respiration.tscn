@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://dwgrf25xjv5qt"]
+[gd_scene load_steps=13 format=3 uid="uid://dwgrf25xjv5qt"]
 
 [ext_resource type="PackedScene" path="res://scenes/stages/WorkspaceStage1.tscn" id="1_6c3yw"]
 [ext_resource type="PackedScene" uid="uid://d1m2ug6pcr8c5" path="res://scenes/systems/TrashZone.tscn" id="2_ahljy"]
@@ -11,6 +11,7 @@
 [ext_resource type="Script" path="res://scripts/stages/Stage2Controller.gd" id="9_stage2"]
 [ext_resource type="PackedScene" uid="uid://d1hqvprd9lbm5" path="res://scenes/ui/HUD_Stage2.tscn" id="10_hud2"]
 [ext_resource type="PackedScene" uid="uid://d3mnxc7xvr1l3" path="res://scenes/ui/TutorialOverlay.tscn" id="11_tut"]
+[ext_resource type="PackedScene" uid="uid://c4apnxk1l8fco" path="res://scenes/ui/StageComplete.tscn" id="12_stage_complete"]
 
 [node name="Stage2" type="Node2D"]
 script = ExtResource("9_stage2")
@@ -87,3 +88,5 @@ anchor_mode = 0
 [node name="HUD" parent="." instance=ExtResource("10_hud2")]
 
 [node name="TutorialOverlay" parent="." instance=ExtResource("11_tut")]
+
+[node name="StageComplete" parent="." instance=ExtResource("12_stage_complete")]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://ctqto8jkyg11f"]
+[gd_scene load_steps=14 format=3 uid="uid://ctqto8jkyg11f"]
 
 [ext_resource type="PackedScene" uid="uid://bxirfan5mrhh0" path="res://scenes/stages/WorkspaceStage1.tscn" id="1_6c3yw"]
 [ext_resource type="PackedScene" uid="uid://d1m2ug6pcr8c5" path="res://scenes/systems/TrashZone.tscn" id="2_ahljy"]
@@ -9,8 +9,13 @@
 [ext_resource type="PackedScene" uid="uid://bcypl8xr2lnmx" path="res://scenes/molecules/Photon.tscn" id="7_4t07n"]
 [ext_resource type="PackedScene" path="res://scenes/molecules/CO2.tscn" id="8_3fckm"]
 [ext_resource type="PackedScene" path="res://scenes/molecules/H2O.tscn" id="9_hqpor"]
+[ext_resource type="Script" uid="uid://0pa8nm8pc68w" path="res://scripts/stages/Stage1Controller.gd" id="10_stage1"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD_Stage1.tscn" id="11_hud1"]
+[ext_resource type="PackedScene" path="res://scenes/ui/StageComplete.tscn" id="12_stage_complete"]
+[ext_resource type="PackedScene" path="res://scenes/ui/TutorialOverlay.tscn" id="13_tut"]
 
 [node name="Stage1" type="Node2D"]
+script = ExtResource("10_stage1")
 
 [node name="Sky" type="ColorRect" parent="."]
 anchors_preset = 15
@@ -94,3 +99,9 @@ script = ExtResource("5_4l9gh")
 position = Vector2(3, 1)
 anchor_mode = 0
 zoom = Vector2(0.9, 0.9)
+
+[node name="HUD" parent="." instance=ExtResource("11_hud1")]
+
+[node name="StageComplete" parent="." instance=ExtResource("12_stage_complete")]
+
+[node name="TutorialOverlay" parent="." instance=ExtResource("13_tut")]

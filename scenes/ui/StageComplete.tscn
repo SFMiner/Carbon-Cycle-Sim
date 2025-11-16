@@ -1,0 +1,101 @@
+[gd_scene load_steps=2 format=3 uid="uid://dox253w6qnqxl"]
+
+[ext_resource type="Script" uid="uid://dmn2tyjkxfxx5" path="res://scripts/ui/StageComplete.gd" id="1_stage_complete"]
+
+[node name="StageComplete" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_stage_complete")
+
+[node name="Blocker" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0, 0, 0, 0.7)
+
+[node name="Content" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -200.0
+offset_right = 300.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="Content"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Content/Panel"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StageLabel" type="Label" parent="Content/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Stage 1 Complete!"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 28
+font_colors/font_color = Color(1, 1, 1, 1)
+
+
+[node name="StatisticsPanel" type="Panel" parent="Content/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Content/Panel/VBoxContainer/StatisticsPanel"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = -15.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TimeLabel" type="Label" parent="Content/Panel/VBoxContainer/StatisticsPanel/VBoxContainer"]
+layout_mode = 2
+text = "Time: 45.3 seconds"
+theme_override_font_sizes/font_size = 18
+font_colors/font_color = Color(1, 1, 1, 1)
+
+[node name="ReactionsLabel" type="Label" parent="Content/Panel/VBoxContainer/StatisticsPanel/VBoxContainer"]
+layout_mode = 2
+text = "Reactions: 12"
+theme_override_font_sizes/font_size = 18
+font_colors/font_color = Color(1, 1, 1, 1)
+
+
+[node name="EfficiencyLabel" type="Label" parent="Content/Panel/VBoxContainer/StatisticsPanel/VBoxContainer"]
+layout_mode = 2
+text = "Efficiency: 87.5%"
+theme_override_font_sizes/font_size = 18
+font_colors/font_color = Color(1, 1, 1, 1)
+
+[node name="ContinueButton" type="Button" parent="Content"]
+layout_mode = 0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -50.0
+offset_right = -10.0
+grow_horizontal = 2
+text = "Continue"
