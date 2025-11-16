@@ -48,7 +48,7 @@ func update_molecule_counts() -> void:
 	# Update labels
 	glucose_label.text = "Glucose: %d" % glucose_count
 	o2_label.text = "O₂: %d" % o2_count
-	energy_label.text = "Energy: %d ATP" % (GameManager.glucose_broken * 3)
+	energy_label.text = "Energy: %d ATP" % (GameManager.glucose_broken_down * 3)
 
 
 func update_progress(glucose_count: int) -> void:

@@ -4,7 +4,7 @@ class_name MoleculeSpawner
 @export var molecule_scene: PackedScene
 @export var spawn_rate: float = 2.0
 @export var spawn_zone_min: Vector2 = Vector2.ZERO
-@export var spawn_zone_max: Vector2 = Vector2(100, 100)
+@export var spawn_zone_max: Vector2 = Vector2(1280, 720)
 @export var max_molecules: int = 30
 @export var enabled: bool = true
 @export var destroy_on_clear: bool = false  # if true, we free everything instead of pooling

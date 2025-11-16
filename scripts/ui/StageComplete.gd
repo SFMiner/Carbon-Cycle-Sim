@@ -6,7 +6,7 @@ class_name StageComplete
 @onready var time_label: Label = $Content/StatisticsPanel/VBoxContainer/TimeLabel
 @onready var reactions_label: Label = $Content/StatisticsPanel/VBoxContainer/ReactionsLabel
 @onready var efficiency_label: Label = $Content/StatisticsPanel/VBoxContainer/EfficiencyLabel
-
+const audio : bool = false
 signal continue_pressed()
 
 
@@ -26,7 +26,8 @@ func show_completion(stage_num: int, time: float, reactions: int, efficiency: fl
 	efficiency_label.text = "Efficiency: %.1f%%" % (efficiency * 100.0)
 
 	# Play fanfare sound
-	AudioManager.play_sound(AudioManager.SoundType.STAGE_COMPLETE)
+	if audio: 
+		AudioManager.play_sound(AudioManager.SoundType.STAGE_COMPLETE)
 
 
 func _on_continue_pressed() -> void:

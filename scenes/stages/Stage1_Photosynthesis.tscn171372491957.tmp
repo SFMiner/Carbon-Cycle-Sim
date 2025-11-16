@@ -67,22 +67,23 @@ position = Vector2(1030, -27)
 script = ExtResource("6_03rq1")
 molecule_scene = ExtResource("7_4t07n")
 spawn_rate = 4.0
-spawn_zone_max = Vector2(1200, 10)
+spawn_zone_min = Vector2(-400, 0)
+spawn_zone_max = Vector2(400, 0)
 max_molecules = 50
 
 [node name="CO2Spawner" type="Node2D" parent="."]
 position = Vector2(127, 360)
 script = ExtResource("6_03rq1")
 molecule_scene = ExtResource("8_3fckm")
-spawn_zone_min = Vector2(0, 100)
-spawn_zone_max = Vector2(400, 500)
+spawn_zone_min = Vector2(0, -150)
+spawn_zone_max = Vector2(0, 150)
 
 [node name="H2OSpawner" type="Node2D" parent="."]
 position = Vector2(1073, 354)
 script = ExtResource("6_03rq1")
 molecule_scene = ExtResource("9_hqpor")
-spawn_zone_min = Vector2(800, 100)
-spawn_zone_max = Vector2(1200, 600)
+spawn_zone_min = Vector2(0, -150)
+spawn_zone_max = Vector2(0, 150)
 
 [node name="TrashZone" parent="." instance=ExtResource("2_ahljy")]
 
